@@ -6,7 +6,7 @@
     <title>Assignment Write-up</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Times New Roman", Times, serif; /* Change font to Times New Roman */
             margin: 20px;
         }
         h1 {
@@ -20,30 +20,126 @@
             height: auto;
             margin-bottom: 10px;
         }
+        .quadrant {
+            float: left;
+            width: 50%;
+        }
+
+
+        .caption {
+            text-align: center;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <h1>Assignment Write-up</h1>
+    <p>Through this project, I learned about how to carefully use outlining point values to create diverse images. Based off of that basic understanding, I was able to keep building upon the skeleton code to create more defined images through methods like supersampling, pixel sampling, and finally level sampling. Additinally, there were ways to manipulate images by applying transformations and colors. This assignment was a rewarding experience as I was able to workshop different way to navigate rasterization. An interesting aspect to toggle with was that by changing the pixel that is being sampled and then interpolating based off of those points can increase the quality of the image. </p>
 
-    <h2>Introduction</h2>
-    <p>This is the introduction section of the assignment write-up.</p>
+    <h2>Task 1: Drawing Single-Color Triangles</h2>
+    <p>In order to rasterize the triangle with the given points, one must be able to determine the relationship those points have with eachother. There are three points given and each point can be used to create a vector. These three vectors can then be normalized and the dot product between each point and each norm needs to be positive in order for the points to be considered within the triangle. This algorithm would only apply if the points given are in a clockwise fashion. To navigate a situation where the points are counter-clockwise, all the dot products must be negative.
 
-    <h2>Objective</h2>
-    <p>The objective of this assignment is to...</p>
 
-    <h2>Methodology</h2>
-    <p>Our approach involved...</p>
+        It would be redundant to loop through every point in the image so it is more effective to only loop through the points that are within the region of the triangle. This is why I only went through the maximimum and minimum values of the given points.  
+    </p>
 
-    <h2>Results</h2>
-    <p>Here are the results of our analysis:</p>
-    <img src="result1.jpg" alt="Result 1">
-    <img src="result2.jpg" alt="Result 2">
+    <div class>
+        <img src="hw1task1.png" alt="Result 1">
+        <div class="caption"> basic/test4.svg with the default viewing parameters and that pixel inspector on a corner of a triangle </div>
+    </div>
 
-    <h2>Discussion</h2>
-    <p>We interpret the results as...</p>
 
-    <h2>Conclusion</h2>
-    <p>In conclusion,...</p>
+    <h2>Task 2: Antialiasing by Supersampling</h2>
+    <p>The whole idea of supersampling is to take each pixel as a certain number of points and average the color values and apply that averaged color to to the entire pixel. The 'certain number' is determined by the sample rate. As demonstrated in the following pictures, the quality seems to increase as the sample rate increases. This quality increase comes from the facts that the jaggies from the previous rasterization appears softer as the color values blend into eachother and is filtering out high-frequency pixels.  
 
+        In my implementation, I stored the the color value of each sub-pixel into the sample buffer which stored everything in one list. Then, I took every sample rate amount of pixels, averaged them and stored it in the rgb_framebuffer_target. That then rendered the averaged colors. 
+    </p>
+    
+     <div class="quadrant">
+        <img src="hw1task21.png" alt="Result 2">
+        <div class="caption">Sample Rate = 1</div>
+    </div>
+    <div class="quadrant">
+        <img src="hw1task22.png" alt="Result 2">
+        <div class="caption">Sample Rate = 4 </div>
+    </div>
+    <div class="quadrant">
+        <img src="hw1task23.png" alt="Result 2">
+        <div class="caption">Sample Rate = 16</div>
+    </div>
+
+
+    <h2>Task 3: Transforms </h2>
+    <p>As the music blared through the speakers, Cubeman couldn't resist the infectious beat. With a burst of energy, he raised one arm high into the air while simultaneously extending the other arm across his face. With a swift motion, he completed the iconic dab, his body pulsing with excitement. The crowd erupted into cheers as Cubeman struck the pose, his vibrant colors shimmering in the spotlight. </p>
+    <img src="task3.png" alt="Result 1">
+
+    <h2>Task 4: Barycentric coordinates</h2>
+    <p>Barycentric coordinates are a way to represent points within a triangle using weights or proportions relative to its vertices. As shown below in the image to the left, there is a colorful triangle where each vertex of the triangle (A, B, and C) has a corresponding barycentric coordinate: alpha, beta, and gamma which add up to one. This means that any point within the triangle can be represented by a unique combination of alpha, beta, and gamma. Additionally, all three variables are always greater than or equal to 0 and that ensures that the point P lies within the boundaries of the triangle.
+
+    These coordinates are widely used in computer graphics, particularly in tasks like triangle rasterization, interpolation, and mesh deformation as it provides an efficient and intuitive way to work with points within triangles.</p>
+     <div class = "quadrant">    
+         <img src="barycentric1.png" alt="Result 1">
+     </div>
+    <div class = "quadrant">
+        <img src="barycentric2.png" alt="Result 1">
+        <div class="caption"> svg/basic/test7.svg with default viewing parameters and sample rate 1 </div>
+    </div>
+
+
+
+    <h2>Task 5: "Pixel sampling" for texture mapping</h2>
+    <p>Pixel sampling refers to the process of determining the color or value of a pixel in an image or texture. In texture mapping, pixel sampling is used to retrieve the color of texels (texture pixels) and apply them to the corresponding pixels on a 3D model during rendering. When implementing texture mapping, there are two main pixel sampling methods: nearest neighbor and bilinear interpolation. <br>
+
+    Nearest neighbor sampling is the simplest method where the color of the texel nearest to the sampling point is directly used. To implement this, I rounded the texture coordinates to the nearest integer to find the texel. This sampling can lead to pixelation or aliasing artifacts, especially when textures are magnified or minified, as it does not consider the colors of neighboring texels. Despite its simplicity, nearest neighbor sampling is computationally efficient and can be suitable for certain applications where performance is critical or when preserving sharp edges is desired. <br>
+
+    Bilinear interpolation is a more advanced method that calculates the color of the pixel by blending the colors of the four nearest texels. It takes into account the distances between the sampling point and the surrounding texels to determine the contribution of each texel's color. This results in smoother and more visually pleasing texture mapping compared to nearest neighbor sampling. However, it requires more computational overhead due to the interpolation calculations involved. <br>
+    This implementation requires linear interpolation on four colors to be performed first in the horizontal direction, resulting in two intermediate colors. Then, there is another linear interpolation in the vertical direction between those two color and that is the color that is reflected. <br>
+    
+
+    The difference between the two methods becomes more pronounced when there is a significant difference in texel-to-pixel ratio. If the texels are much smaller than the pixels, nearest neighbor sampling may result in noticeable pixelation or aliasing artifacts, while bilinear interpolation can provide smoother and more accurate texture mapping. Conversely, if the texels are larger than the pixels, the difference between the two methods may be less significant.
+    </p>
+    <div class="quadrant">
+        <img src="npssp1.png" alt="Result 2">
+        <div class="caption">Nearest Neighbor Sampling (Pixelation)</div>
+    </div>
+    <div class="quadrant">
+        <img src="npssp16.png" alt="Result 2">
+        <div class="caption">Nearest Neighbor Sampling (Smoothing)</div>
+    </div>
+    <div class="quadrant">
+        <img src="bpisp1.png" alt="Result 2">
+        <div class="caption">Bilinear Interpolation Sampling (Pixelation)</div>
+    </div>
+    <div class="quadrant">
+        <img src="bpisp16.png" alt="Result 2">
+        <div class="caption">Bilinear Interpolation Sampling (Smoothing)</div>
+    </div>
+
+    <h2>Task 6: "Level sampling" with mipmaps for texture mapping</h2>
+    <p>Level sampling, also known as mipmapping, is a technique used in texture mapping to improve rendering performance and reduce aliasing artifacts. It involves creating a series of pre-filtered texture maps at different levels of detail and selecting the most appropriate level for sampling based on the size of the texels relative to the pixels in the rendered image.
+        Mipmaps are generated by downsampling the original texture map to create smaller versions of the texture at different resolutions. Each mipmap level represents the texture at a different level of detail, with lower levels having lower resolutions and higher levels having higher resolutions. The downsampling process typically involves averaging the colors of neighboring texels to generate the colors of texels at lower resolutions.
+        During texture sampling, the renderer determines the appropriate mipmap level to use based on the ratio of texel size to pixel size in the rendered image. If the texels are much smaller than the pixels, a higher-resolution mipmap level is selected to avoid blurriness and preserve detail. If the texels are much larger than the pixels, a lower-resolution mipmap level is selected to improve rendering performance by reducing the number of texture lookups. Once the appropriate mipmap level is selected, texture sampling proceeds as usual, with the renderer retrieving texel colors from the chosen mipmap level and applying them to the corresponding pixels in the rendered image.
+        In terms of speed, pixel sampling is the fastest technique as it involves simple nearest neighbor or bilinear interpolation calculations. Level sampling can offer a balance between speed and quality by selecting an appropriate mipmap level based on texel-to-pixel ratio. However, level sampling requires additional memory to store the mipmaps at different resolutions, increasing memory usage compared to pixel sampling alone.
+        Pixel sampling may result in aliasing artifacts, especially when textures are magnified or minified, as it does not consider the colors of neighboring texels.
+    Level sampling helps reduce aliasing artifacts by selecting the appropriate mipmap level based on texel-to-pixel ratio, resulting in smoother texture mapping.
+    Number of samples per pixel, such as supersampling, can significantly slow down rendering due to the increased number of texture lookups. It can also increase calculations for interpolation and memory usage as it requires storing multiple samples per pixel for antialiasing.
+
+    </p>
+    <div class="quadrant">
+        <img src="l0nearest.png" alt="Result 2">
+        <div class="caption">Level 0 Nearest Neighbor Sampling</div>
+    </div>
+    <div class="quadrant">
+        <img src="l0bilinear.png" alt="Result 2">
+        <div class="caption">Level 0 Bilinear Interpolation Sampling</div>
+    </div>
+    <div class="quadrant">
+        <img src="l1nearest.png" alt="Result 2">
+        <div class="caption">Nearest Level Nearest Neighbor Sampling</div>
+    </div>
+    <div class="quadrant">
+        <img src="l2bilinear.png" alt="Result 2">
+        <div class="caption">Nearest Level Bilinear Interpolation Sampling</div>
+    </div>
 </body>
 </html>
